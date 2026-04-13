@@ -1,0 +1,39 @@
+import random
+import time
+from datetime import datetime
+
+class VibrationSensor:
+    def read(self):
+        normal = random.uniform(2.0, 3.0)
+        is_fault = random.random() < 0.1
+        value = normal + (random.uniform(5, 10) if is_fault else 0)
+        return {
+            "timestamp": datetime.now().isoformat(),
+            "type": "vibration",
+            "value": round(value, 2),
+            "alert": "WARNING" if is_fault else "NORMAL"
+        }
+
+class TemperatureSensor:
+    def read(self):
+        normal = random.uniform(60, 70)
+        is_fault = random.random() < 0.08
+        value = normal + (random.uniform(15, 30) if is_fault else 0)
+        return {
+            "timestamp": datetime.now().isoformat(),
+            "type": "temperature",
+            "value": round(value, 1),
+            "alert": "WARNING" if is_fault else "NORMAL"
+        }
+
+class RPMSensor:
+    def read(self):
+        normal = random.uniform(1450, 1550)
+        is_fault = random.random() < 0.08
+        value = normal + (random.uniform(-200, 200) if is_fault else 0)
+        return {
+            "timestamp": datetime.now().isoformat(),
+            "type": "rpm",
+            "value": int(value),
+            "alert": "UNSTABLE" if is_fault else "NORMAL"
+        }

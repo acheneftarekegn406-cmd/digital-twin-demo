@@ -1,0 +1,34 @@
+from sensors import VibrationSensor, TemperatureSensor, RPMSensor
+
+class DigitalTwin:
+    def __init__(self):
+        self.vib = VibrationSensor()
+        self.temp = TemperatureSensor()
+        self.rpm = RPMSensor()
+        self.health = 100
+        
+    def update(self):
+        v = self.vib.read()
+        t = self.temp.read()
+        r = self.rpm.read()
+        
+        self.health = 100
+        if v['alert'] == 'WARNING':
+            self.health -= 15
+        if t['alert'] == 'WARNING':
+            self.health -= 10
+        if r['alert'] == 'UNSTABLE':
+            self.health -= 12
+        
+        self.health = max(0, min(100, self.health))
+        
+        return {
+            "vibration": v['value'],
+            "vib_alert": v['alert'],
+            "temperature": t['value'],
+            "temp_alert": t['alert'],
+            "rpm": r['value'],
+            "rpm_alert": r['alert'],
+            "health": self.health,
+            "status": "HEALTHY" if self.health >= 70 else "MONITOR" if self.health >= 40 else "CRITICAL"
+        }

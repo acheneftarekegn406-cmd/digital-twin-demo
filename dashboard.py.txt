@@ -1,0 +1,67 @@
+import streamlit as st
+import time
+import pandas as pd
+from twin import DigitalTwin
+from ai_model import SimpleAI
+
+# Page setup
+st.set_page_config(page_title="AI Digital Twin", layout="wide")
+st.title("🏭 AI-Driven Digital Twin for Rotating Machinery")
+st.caption("Live Monitoring | Predictive Maintenance | 3 Fake Sensors")
+
+# Initialize
+twin = DigitalTwin()
+ai = SimpleAI()
+
+# Placeholders for live updates
+metrics_placeholder = st.empty()
+alerts_placeholder = st.empty()
+chart_placeholder = st.empty()
+
+# Store history
+history = {'vibration': [], 'temperature': [], 'health': []}
+
+st.info("🟢 SYSTEM RUNNING - Streaming fake sensor data every second")
+
+# Run for 50 seconds
+for i in range(50):
+    data = twin.update()
+    ai_result = ai.predict(data['vibration'], data['temperature'], data['rpm'], data['health'])
+    
+    # Update history
+    history['vibration'].append(data['vibration'])
+    history['temperature'].append(data['temperature'])
+    history['health'].append(data['health'])
+    
+    if len(history['vibration']) > 20:
+        for key in history:
+            history[key] = history[key][-20:]
+    
+    # Metrics row
+    col1, col2, col3, col4, col5 = st.columns(5)
+    with col1:
+        st.metric("Vibration", f"{data['vibration']} mm/s")
+    with col2:
+        st.metric("Temperature", f"{data['temperature']} °C")
+    with col3:
+        st.metric("RPM", f"{data['rpm']}")
+    with col4:
+        st.metric("Health", f"{data['health']}%")
+    with col5:
+        color = "🔴" if ai_result['severity'] == 'HIGH' else "🟡" if ai_result['severity'] == 'MEDIUM' else "🟢"
+        st.metric("AI Status", f"{color} {ai_result['severity']}")
+    
+    # Alerts
+    if ai_result['alerts']:
+        for alert in ai_result['alerts']:
+            st.error(f"🚨 {alert}")
+    else:
+        st.success("✅ No anomalies detected")
+    
+    # Chart
+    df = pd.DataFrame(history)
+    st.line_chart(df)
+    
+    time.sleep(1)
+
+st.success("✅ Demo complete! System successfully monitored machine health.")

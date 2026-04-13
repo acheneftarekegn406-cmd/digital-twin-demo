@@ -1,0 +1,27 @@
+class SimpleAI:
+    def predict(self, vibration, temperature, rpm, health):
+        anomalies = []
+        
+        if vibration > 8.0:
+            anomalies.append("High vibration - Possible bearing fault")
+        elif vibration > 5.0:
+            anomalies.append("Elevated vibration - Monitor closely")
+            
+        if temperature > 90:
+            anomalies.append("Overheating - Check lubrication")
+        elif temperature > 80:
+            anomalies.append("High temperature - Schedule inspection")
+            
+        if rpm < 1200 or rpm > 1800:
+            anomalies.append("RPM instability - Possible imbalance")
+            
+        if health < 40:
+            anomalies.append("CRITICAL - Immediate maintenance required")
+        elif health < 70:
+            anomalies.append("Warning - Schedule maintenance within 1 week")
+            
+        return {
+            "is_anomaly": len(anomalies) > 0,
+            "alerts": anomalies,
+            "severity": "HIGH" if health < 40 else "MEDIUM" if health < 70 else "LOW"
+        }
